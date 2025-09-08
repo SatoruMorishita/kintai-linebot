@@ -56,11 +56,12 @@ def get_work_summary(name):
     hours = total_minutes // 60
     minutes = total_minutes % 60
     return f"{name}さんの今月の勤務時間は {hours}時間{minutes}分 です"
-@app.route("/line_webhook", methods=["POST"])
-def line_webhook():
+    #################################################
+#@app.route("/line_webhook", methods=["POST"])
+#def line_webhook():
     # LINEからのイベント処理
-    return "OK"
-
+ #   return "OK"
+    #################################################
 # 環境変数から認証情報を取得（Renderで設定）
 CHANNEL_SECRET = os.environ.get("LINE_CHANNEL_SECRET")
 CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN")
