@@ -1,2 +1,2 @@
 # kintai-linebot
-#googleスプレッドシート、linebot,バックエンドはFly.ioでデプロイ
+#googleスプレッドシート、linebot,バックエンドはGoogle Cloud Runでデプロイ
