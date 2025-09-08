@@ -1,1 +1,10 @@
+app = "your-app-name"
 
+[env]
+  GOOGLE_CREDENTIALS = "base64でエンコードしたJSON文字列"
+  LINE_CHANNEL_SECRET = "your-line-secret"
+  LINE_CHANNEL_ACCESS_TOKEN = "your-access-token"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
