@@ -5,6 +5,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
+import base64
+import os
 ####################################################################
 #####勤怠管理用コード###############################################################
 # Renderの環境変数から復元
