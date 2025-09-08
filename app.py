@@ -7,6 +7,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import base64
 import os
+from flask import Flask, request, abort
 ####################################################################
 #####勤怠管理用コード###############################################################
 # Renderの環境変数から復元
