@@ -112,7 +112,7 @@ def handle_message(event):
     except Exception:
         name = event.source.user_id
 
-    # メッセージ内容に応じた処理
+    # 🔽 この「メッセージ内容に応じた処理」の if 文の中に追加！
     if user_text == "出勤":
         record_clock_in(name)
         reply_text = "出勤を記録しました！"
@@ -121,13 +121,32 @@ def handle_message(event):
         reply_text = "退勤を記録しました！"
     elif user_text == "集計":
         reply_text = get_work_summary(name)
+    elif user_text == "メニュー":
+        # 🔽 ここにテンプレートメッセージを追加
+        buttons_template = TemplateSendMessage(
+            alt_text="勤怠メニュー",
+            template=ButtonsTemplate(
+                title="勤怠メニュー",
+                text="操作を選んでください",
+                actions=[
+                    PostbackAction(label="出勤", data="action=clock_in"),
+                    PostbackAction(label="退勤", data="action=clock_out"),
+                    PostbackAction(label="集計", data="action=summary"),
+                    PostbackAction(label="休暇申請", data="action=vacation")
+                ]
+            )
+        )
+        line_bot_api.reply_message(event.reply_token, buttons_template)
+        return
     else:
         reply_text = f"「{user_text}」ですね！了解です🦊"
 
+    # 通常のテキスト返信
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply_text)
     )
+
 
 # ローカル実行（Fly.ioやRenderでもPORT環境変数を使用）
 if __name__ == '__main__':
