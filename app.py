@@ -174,6 +174,38 @@ def get_shift_schedule(name):
         logging.error(f"シフト取得失敗: {e}")
         return "シフト確認中にエラーが発生しました。"
 
+from linebot.models import PostbackEvent
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    data = event.postback.data
+
+    try:
+        profile = line_bot_api.get_profile(event.source.user_id)
+        name = profile.display_name
+    except Exception:
+        name = event.source.user_id
+
+    if data == "action=clock_in":
+        record_clock_in(name)
+        reply_text = "出勤を記録しました！"
+    elif data == "action=clock_out":
+        record_clock_out(name)
+        reply_text = "退勤を記録しました！"
+    elif data == "action=summary":
+        reply_text = get_work_summary(name)
+    elif data == "action=vacation":
+        reply_text = "休暇申請は「休暇申請 有休 2025/09/15 理由」の形式で送ってください🌿"
+    elif data == "action=shift":
+        reply_text = get_shift_schedule(name)
+    else:
+        reply_text = "未対応の操作です"
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=reply_text)
+    )
+
 # ローカル実行（Fly.ioやRenderでもPORT環境変数を使用）
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
