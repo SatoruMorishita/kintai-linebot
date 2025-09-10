@@ -139,7 +139,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, buttons_template)
         return
     elif user_text.startswith("休暇申請"):
-    reply_text = record_vacation_request(name, user_text)
+        reply_text = record_vacation_request(name, user_text)
     else:
         reply_text = f"「{user_text}」ですね！了解です🦊"
 
