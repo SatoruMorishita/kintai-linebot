@@ -198,6 +198,12 @@ def handle_postback(event):
         reply_text = "休暇申請は「休暇申請 有休 2025/09/15 理由」の形式で送ってください🌿"
     elif data == "action=shift":
         reply_text = get_shift_schedule(name)
+    elif user_text.startswith("承認"):
+    parts = user_text.split()
+    if len(parts) >= 3:
+        reply_text = approve_vacation(parts[1], parts[2])
+    else:
+        reply_text = "承認形式が正しくありません。例：承認 2025/09/15 名前"
     else:
         reply_text = "未対応の操作です"
 
