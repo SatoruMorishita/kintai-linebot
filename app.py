@@ -138,6 +138,8 @@ def handle_message(event):
         )
         line_bot_api.reply_message(event.reply_token, buttons_template)
         return
+    elif user_text.startswith("休暇申請"):
+    reply_text = record_vacation_request(name, user_text)
     else:
         reply_text = f"「{user_text}」ですね！了解です🦊"
 
@@ -147,6 +149,28 @@ def handle_message(event):
         TextSendMessage(text=reply_text)
     )
 
+def get_shift_schedule(name):
+    try:
+        shift_sheet = client.open("勤怠管理").worksheet("シフト")
+        records = shift_sheet.get_all_records()
+        today = datetime.now()
+        this_week = [today.strftime("%Y/%m/%d")]
+        for i in range(1, 7):
+            day = today.replace(day=today.day + i)
+            this_week.append(day.strftime("%Y/%m/%d"))
+
+        shifts = []
+        for row in records:
+            if row["名前"] == name and row["日付"] in this_week:
+                shifts.append(f"{row['日付']}: {row['開始時間']}〜{row['終了時間']}")
+
+        if shifts:
+            return "\n".join(shifts)
+        else:
+            return "今週のシフトは登録されていません。"
+    except Exception as e:
+        logging.error(f"シフト取得失敗: {e}")
+        return "シフト確認中にエラーが発生しました。"
 
 # ローカル実行（Fly.ioやRenderでもPORT環境変数を使用）
 if __name__ == '__main__':
