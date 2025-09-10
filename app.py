@@ -114,34 +114,36 @@ def handle_message(event):
 
     # 🔽 この「メッセージ内容に応じた処理」の if 文の中に追加！
     if user_text == "出勤":
-        record_clock_in(name)
-        reply_text = "出勤を記録しました！"
-    elif user_text == "退勤":
-        record_clock_out(name)
-        reply_text = "退勤を記録しました！"
-    elif user_text == "集計":
-        reply_text = get_work_summary(name)
-    elif user_text == "メニュー":
-        # 🔽 ここにテンプレートメッセージを追加
-        buttons_template = TemplateSendMessage(
-            alt_text="勤怠メニュー",
-            template=ButtonsTemplate(
-                title="勤怠メニュー",
-                text="操作を選んでください",
-                actions=[
-                    PostbackAction(label="出勤", data="action=clock_in"),
-                    PostbackAction(label="退勤", data="action=clock_out"),
-                    PostbackAction(label="集計", data="action=summary"),
-                    PostbackAction(label="休暇申請", data="action=vacation")
-                ]
-            )
+    record_clock_in(name)
+    reply_text = "出勤を記録しました！"
+elif user_text == "退勤":
+    record_clock_out(name)
+    reply_text = "退勤を記録しました！"
+elif user_text == "集計":
+    reply_text = get_work_summary(name)
+elif user_text == "シフト確認":
+    reply_text = get_shift_schedule(name)
+elif user_text.startswith("休暇申請"):
+    reply_text = record_vacation_request(name, user_text)
+elif user_text == "メニュー":
+    buttons_template = TemplateSendMessage(
+        alt_text="勤怠メニュー",
+        template=ButtonsTemplate(
+            title="勤怠メニュー",
+            text="操作を選んでください",
+            actions=[
+                PostbackAction(label="出勤", data="action=clock_in"),
+                PostbackAction(label="退勤", data="action=clock_out"),
+                PostbackAction(label="集計", data="action=summary"),
+                PostbackAction(label="休暇申請", data="action=vacation"),
+                PostbackAction(label="シフト確認", data="action=shift")
+            ]
         )
-        line_bot_api.reply_message(event.reply_token, buttons_template)
-        return
-    elif user_text.startswith("休暇申請"):
-        reply_text = record_vacation_request(name, user_text)
-    else:
-        reply_text = f"「{user_text}」ですね！了解です🦊"
+    )
+    line_bot_api.reply_message(event.reply_token, buttons_template)
+    return
+else:
+    reply_text = f"「{user_text}」ですね！了解です🦊"
 
     # 通常のテキスト返信
     line_bot_api.reply_message(
