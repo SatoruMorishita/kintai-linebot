@@ -206,6 +206,43 @@ def handle_postback(event):
         TextSendMessage(text=reply_text)
     )
 
+def record_vacation_request(name, text):
+    try:
+        parts = text.split()
+        if len(parts) < 4:
+            return "申請形式が正しくありません。例：休暇申請 有休 2025/09/15 理由"
+
+        kind = parts[1]
+        date = parts[2]
+        reason = " ".join(parts[3:])
+        vacation_sheet = client.open("勤怠管理").worksheet("休暇申請")
+        vacation_sheet.append_row([date, name, kind, reason, "申請中"])
+
+        # 管理者通知
+        admin_id = os.environ.get("LINE_ADMIN_USER_ID")
+        if admin_id:
+            notify_text = f"{name}さんが{date}に{kind}申請しました。\n理由：{reason}"
+            line_bot_api.push_message(admin_id, TextSendMessage(text=notify_text))
+
+        return f"{date}の{kind}申請を受け付けました！"
+    except Exception as e:
+        logging.error(f"休暇申請失敗: {e}")
+        return "申請中にエラーが発生しました。"
+        
+def approve_vacation(date, name):
+    try:
+        vacation_sheet = client.open("勤怠管理").worksheet("休暇申請")
+        records = vacation_sheet.get_all_records()
+        for i, row in enumerate(records):
+            if row["日付"] == date and row["名前"] == name:
+                row_index = i + 2  # ヘッダー分
+                vacation_sheet.update_cell(row_index, 5, "承認済")
+                return f"{date}の{name}さんの申請を承認しました！"
+        return "該当する申請が見つかりませんでした。"
+    except Exception as e:
+        logging.error(f"承認処理失敗: {e}")
+        return "承認中にエラーが発生しました。"
+
 # ローカル実行（Fly.ioやRenderでもPORT環境変数を使用）
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
