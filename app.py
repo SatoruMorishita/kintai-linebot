@@ -105,51 +105,55 @@ def callback():
 def handle_message(event):
     user_text = event.message.text.strip()
 
-    # LINEユーザー名取得（失敗時はIDで代用）
     try:
         profile = line_bot_api.get_profile(event.source.user_id)
         name = profile.display_name
     except Exception:
         name = event.source.user_id
 
-    # 🔽 この「メッセージ内容に応じた処理」の if 文の中に追加！
-if user_text == "出勤":
-    record_clock_in(name)
-    reply_text = "出勤を記録しました！"
-elif user_text == "退勤":
-    record_clock_out(name)
-    reply_text = "退勤を記録しました！"
-elif user_text == "集計":
-    reply_text = get_work_summary(name)
-elif user_text == "シフト確認":
-    reply_text = get_shift_schedule(name)
-elif user_text.startswith("休暇申請"):
-    reply_text = record_vacation_request(name, user_text)
-elif user_text == "メニュー":
-    buttons_template = TemplateSendMessage(
-        alt_text="勤怠メニュー",
-        template=ButtonsTemplate(
-            title="勤怠メニュー",
-            text="操作を選んでください",
-            actions=[
-                PostbackAction(label="出勤", data="action=clock_in"),
-                PostbackAction(label="退勤", data="action=clock_out"),
-                PostbackAction(label="集計", data="action=summary"),
-                PostbackAction(label="休暇申請", data="action=vacation"),
-                PostbackAction(label="シフト確認", data="action=shift")
-            ]
+    if user_text == "出勤":
+        record_clock_in(name)
+        reply_text = "出勤を記録しました！"
+    elif user_text == "退勤":
+        record_clock_out(name)
+        reply_text = "退勤を記録しました！"
+    elif user_text == "集計":
+        reply_text = get_work_summary(name)
+    elif user_text == "シフト確認":
+        reply_text = get_shift_schedule(name)
+    elif user_text.startswith("休暇申請"):
+        reply_text = record_vacation_request(name, user_text)
+    elif user_text.startswith("承認"):
+        parts = user_text.split()
+        if len(parts) >= 3:
+            reply_text = approve_vacation(parts[1], parts[2])
+        else:
+            reply_text = "承認形式が正しくありません。例：承認 2025/09/15 名前"
+    elif user_text == "メニュー":
+        buttons_template = TemplateSendMessage(
+            alt_text="勤怠メニュー",
+            template=ButtonsTemplate(
+                title="勤怠メニュー",
+                text="操作を選んでください",
+                actions=[
+                    PostbackAction(label="出勤", data="action=clock_in"),
+                    PostbackAction(label="退勤", data="action=clock_out"),
+                    PostbackAction(label="集計", data="action=summary"),
+                    PostbackAction(label="休暇申請", data="action=vacation"),
+                    PostbackAction(label="シフト確認", data="action=shift")
+                ]
+            )
         )
-    )
-    line_bot_api.reply_message(event.reply_token, buttons_template)
-    return
-else:
-    reply_text = f"「{user_text}」ですね！了解です🦊"
+        line_bot_api.reply_message(event.reply_token, buttons_template)
+        return
+    else:
+        reply_text = f"「{user_text}」ですね！了解です🦊"
 
-    # 通常のテキスト返信
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply_text)
     )
+
 
 def get_shift_schedule(name):
     try:
