@@ -113,7 +113,7 @@ def handle_message(event):
         name = event.source.user_id
 
     # 🔽 この「メッセージ内容に応じた処理」の if 文の中に追加！
-    if user_text == "出勤":
+if user_text == "出勤":
     record_clock_in(name)
     reply_text = "出勤を記録しました！"
 elif user_text == "退勤":
