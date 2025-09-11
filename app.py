@@ -123,6 +123,7 @@ def handle_message(event):
         reply_text = get_shift_schedule(name)
     elif user_text.startswith("休暇申請"):
         reply_text = record_vacation_request(name, user_text)
+
     elif user_text.startswith("承認"):
         parts = user_text.split()
         if len(parts) >= 3:
@@ -202,18 +203,14 @@ def handle_postback(event):
         reply_text = "休暇申請は「休暇申請 有休 2025/09/15 理由」の形式で送ってください🌿"
     elif data == "action=shift":
         reply_text = get_shift_schedule(name)
-    elif user_text.startswith("承認"):
-        parts = user_text.split()
-    if len(parts) >= 3:
-        reply_text = approve_vacation(parts[1], parts[2])
     else:
-        reply_text = "承認形式が正しくありません。例：承認 2025/09/15 名前"
-
+        reply_text = "未対応の操作です"
 
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply_text)
     )
+
 
 def record_vacation_request(name, text):
     try:
