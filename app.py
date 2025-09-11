@@ -199,13 +199,12 @@ def handle_postback(event):
     elif data == "action=shift":
         reply_text = get_shift_schedule(name)
     elif user_text.startswith("承認"):
-    parts = user_text.split()
+        parts = user_text.split()
     if len(parts) >= 3:
         reply_text = approve_vacation(parts[1], parts[2])
     else:
         reply_text = "承認形式が正しくありません。例：承認 2025/09/15 名前"
-    else:
-        reply_text = "未対応の操作です"
+
 
     line_bot_api.reply_message(
         event.reply_token,
